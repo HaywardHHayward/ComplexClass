@@ -201,3 +201,8 @@ class Complex:
         else:
             raise ValueError(f"value of 'imaginary' attribute is non-zero. Unable to cast to 'float'\n'imaginary' = {self.imaginary}")
 
+def ToComplex(number, imaginary = 0):
+    if (type(number) is int) or (type(number) is float):
+        return Complex(number, imaginary)
+    else:
+        raise TypeError("unsupported type(s). Only accepted types are 'int' and 'float'.")
