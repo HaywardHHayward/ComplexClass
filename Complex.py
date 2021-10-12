@@ -4,8 +4,11 @@ class Complex:
     
     def __init__(self, real, imaginary = 0):
         if (type(real) is complex):
-            self.real = real.real
-            self.imaginary = real.imag
+            if imaginary == 0:
+                self.real = real.real
+                self.imaginary = real.imag
+            else:
+                raise ValueError(f"unexpected initialization value(s). If the initialization variable 'real' is of type 'complex', the initialization variable 'imaginary' should be omitted.\ntype of 'real': {type(real).__name__}\n'imaginary': {imaginary}")
         elif ((type(real) is not int) and (type(real) is not float)) or ((type(imaginary) is not int) and (type(imaginary) is not float)):
             raise TypeError(f"invalid initialization type(s). Only 'int', 'float', and 'complex' is supported for Complex() initialization.\nreal: '{type(real).__name__}'\nimaginary: '{type(imaginary).__name__}'")
         else:
@@ -230,4 +233,4 @@ def ToComplex(number, imaginary = 0):
     elif (type(number) is complex):
         return Complex(number.real, number.imag)
     else:
-        raise TypeError(f"unsupported type(s). Only accepted types are 'int', 'float', and 'complex'.\nAttempted cast type = '{type(number).__name__}'")
+        raise TypeError(f"unsupported type(s). Only accepted types are 'int', 'float', and 'complex'.\nAttempted cast type: '{type(number).__name__}'")
