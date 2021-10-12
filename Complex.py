@@ -3,13 +3,13 @@ import math
 class Complex:
     
     def __init__(self, real, imaginary = 0):
-        if (type(real) is complex):
+        if type(real) is complex:
             if imaginary == 0:
                 self.real = real.real
                 self.imaginary = real.imag
             else:
                 raise ValueError(f"unexpected initialization value(s). If the initialization variable 'real' is of type 'complex', the initialization variable 'imaginary' should be omitted.\ntype of 'real': {type(real).__name__}\n'imaginary': {imaginary}")
-        elif ((type(real) is not int) and (type(real) is not float)) or ((type(imaginary) is not int) and (type(imaginary) is not float)):
+        elif (not isinstance(real, (int, float))) or (not isinstance(imaginary, (int, float))):
             raise TypeError(f"invalid initialization type(s). Only 'int', 'float', and 'complex' is supported for Complex() initialization.\nreal: '{type(real).__name__}'\nimaginary: '{type(imaginary).__name__}'")
         else:
             self.real = real
@@ -52,9 +52,9 @@ class Complex:
         return Complex(-self.real, -self.imaginary)
     
     def __add__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            return Complex(self.real + other, self.imaginary)
-        elif (type(other) is Complex):
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
+        if type(other) is Complex:
             return Complex(self.real + other.real, self.imaginary + other.imaginary)
         else:
             raise TypeError(f"unsupported operand type(s) for +: 'Complex' and '{type(other).__name__}'")
@@ -63,9 +63,9 @@ class Complex:
         return self + other
     
     def __sub__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            return Complex(self.real - other, self.imaginary)
-        elif (type(other) is Complex):
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
+        if type(other) is Complex:
             return Complex(self.real - other.real, self.imaginary - other.imaginary)
         else:
             raise TypeError(f"unsupported operand type(s) for -: 'Complex' and '{type(other).__name__}'")
@@ -74,9 +74,9 @@ class Complex:
         return other + (-self)
     
     def __mul__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            return Complex(self.real * other, self.imaginary * other)
-        elif (type(other) is Complex):
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
+        if type(other) is Complex:
             return Complex((self.real * other.real) - (self.imaginary * other.imaginary), (self.real * other.imaginary) + (self.imaginary * other.real))
         else:
             raise TypeError(f"unsupported operand type(s) for *: 'Complex' and '{type(other).__name__}'")
@@ -85,68 +85,80 @@ class Complex:
         return self * other
     
     def __truediv__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            return Complex(self.real / other, self.imaginary / other)
-        elif (type(other) is Complex):
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
+        if type(other) is Complex:
             return Complex(((self.real * other.real) + (self.imaginary * other.imaginary)) / (other.real ** 2 + other.imaginary ** 2), ((self.imaginary * other.real) - (self.real * other.imaginary)) / (other.real ** 2 + other.imaginary ** 2))
         else:
             raise TypeError(f"unsupported operand type(s) for /: 'Complex' and '{type(other).__name__}'")
 
     def __rtruediv__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            other_number = Complex(other, 0)
+        if isinstance(other, (int, float, complex)):
+            other_number = Complex(other)
         else:
             raise TypeError(f"unsupported operand type(s) for /: 'Complex' and '{type(other).__name__}'")
         return other_number / self
     
     def __floordiv__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            return math.floor(Complex(self.real / other, self.imaginary / other))
-        elif (type(other) is Complex):
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
+        if type(other) is Complex:
             return math.floor(Complex(((self.real * other.real) + (self.imaginary * other.imaginary)) / (other.real ** 2 + other.imaginary ** 2), ((self.imaginary * other.real) - (self.real * other.imaginary)) / (other.real ** 2 + other.imaginary ** 2)))
         else:
             raise TypeError(f"unsupported operand type(s) for //: 'Complex' and '{type(other).__name__}'")
     
     def __rfloordiv__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            other_number = Complex(other, 0)
+        if isinstance(other, (int, float, complex)):
+            other_number = Complex(other)
         else:
             raise TypeError(f"unsupported operand type(s) for /: 'Complex' and '{type(other).__name__}'")
         return other_number // self
     
     def __mod__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            other_number = Complex(other, 0)
-        elif (type(other) is Complex):
-            other_number = other
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
+        if type(other) is Complex:
+            quotiant = (self // other) * other
+            return self - quotiant
         else:
             raise TypeError(f"unsupported operand type(s) for %: 'Complex' and '{type(other).__name__}'")
-        quotiant = (self // other_number) * other_number
-        return self - quotiant
-    
+
     def __rmod__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            other_number = Complex(other, 0)
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
         else:
             raise TypeError(f"unsupported operand type(s) for /: 'Complex' and '{type(other).__name__}'")
-        return other_number % self
-
+        return other % self
     
+    def __divmod__(self, other):
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
+        if type(other) is Complex:
+            return (self // other, self % other)
+        else:
+            raise TypeError(f"unsupported operand type(s) for divmod(): 'Complex' and '{type(other).__name__}'")
+
+    def __rdivmod__(self, other):
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
+        else:
+            raise TypeError(f"unsupported operand type(s) for divmod(): 'Complex' and '{type(other).__name__}'")
+        return divmod(other, self)
+
     def __pow__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            other_name = Complex(other, 0)
-        elif (type(other) is Complex):
-            other_name = other
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
+        elif type(other) is Complex:
+            return (abs(self) ** other.real) * (Complex(math.cos(math.log(abs(self)) * other.imaginary), math.sin(math.log(abs(self)) * other.imaginary))) * Complex(math.cos(self.argument * other.real), math.sin(self.argument * other.real)) / math.exp(self.argument * other.imaginary)
         else:
             raise TypeError(f"unsupported operand type(s) for ** or pow(): 'Complex' and '{type(other).__name__}'")
-        return (abs(self) ** other_name.real) * (Complex(math.cos(math.log(abs(self)) * other_name.imaginary), math.sin(math.log(abs(self)) * other_name.imaginary))) * Complex(math.cos(self.argument * other_name.real), math.sin(self.argument * other_name.real)) / math.exp(self.argument * other_name.imaginary)
     
     def __rpow__(self, other):
-        if (type(other) is int) or (type(other) is float):
-            other_name = Complex(other, 0)
+        if isinstance(other, (int, float, complex)):
+            other = Complex(other)
         else:
             raise TypeError(f"unsupported operand type(s) for ** or pow(): 'Complex' and '{type(other).__name__}'")
-        return other_name ** self
+        return other ** self
     
     def log(self, base=math.e):
         if type(base) is not Complex:
@@ -165,7 +177,7 @@ class Complex:
                 return True
             else:
                 return False
-        elif (type(other) is int) or (type(other) is float):
+        elif isinstance(other, (int, float)):
             if abs(self.imaginary) < 0.00000001:
                 if abs(self.real - other) < 0.00000001:
                     return True
@@ -226,13 +238,3 @@ class Complex:
 
     def __complex__(self):
         return complex(self.real, self.imaginary)
-
-def ToComplex(number, imaginary = 0):
-    if (type(number) is int) or (type(number) is float):
-        return Complex(number, imaginary)
-    elif (type(number) is complex):
-        return Complex(number.real, number.imag)
-    elif (type(number) is Complex):
-        return number
-    else:
-        raise TypeError(f"unsupported type(s). Only accepted types are 'int', 'float', and 'complex'.\nAttempted cast type: '{type(number).__name__}'")
