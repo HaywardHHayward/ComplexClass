@@ -148,7 +148,7 @@ class Complex:
     def __pow__(self, other):
         if isinstance(other, (int, float, complex)):
             other = Complex(other)
-        elif type(other) is Complex:
+        if type(other) is Complex:
             return (abs(self) ** other.real) * (Complex(math.cos(math.log(abs(self)) * other.imaginary), math.sin(math.log(abs(self)) * other.imaginary))) * Complex(math.cos(self.argument * other.real), math.sin(self.argument * other.real)) / math.exp(self.argument * other.imaginary)
         else:
             raise TypeError(f"unsupported operand type(s) for ** or pow(): 'Complex' and '{type(other).__name__}'")
@@ -238,3 +238,5 @@ class Complex:
 
     def __complex__(self):
         return complex(self.real, self.imaginary)
+
+print(Complex(1,2) ** 2)
