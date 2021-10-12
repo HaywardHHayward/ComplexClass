@@ -238,5 +238,3 @@ class Complex:
 
     def __complex__(self):
         return complex(self.real, self.imaginary)
-
-print(Complex(1,2) ** 2)
