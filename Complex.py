@@ -2,11 +2,15 @@ import math
 
 class Complex:
     
-    def __init__(self, real, imaginary):
-        if ((type(real) is not int) and (type(real) is not float)) or ((type(imaginary) is not int) and (type(imaginary) is not float)):
-            raise TypeError(f"invalid initialization type(s). Only 'int' and 'float' is supported for Complex() initialization.\nreal: '{type(real).__name__}'\nimaginary: '{type(imaginary).__name__}'")
-        self.real = real
-        self.imaginary = imaginary
+    def __init__(self, real, imaginary = 0):
+        if (type(real) is complex):
+            self.real = real.real
+            self.imaginary = real.imag
+        elif ((type(real) is not int) and (type(real) is not float)) or ((type(imaginary) is not int) and (type(imaginary) is not float)):
+            raise TypeError(f"invalid initialization type(s). Only 'int', 'float', and 'complex' is supported for Complex() initialization.\nreal: '{type(real).__name__}'\nimaginary: '{type(imaginary).__name__}'")
+        else:
+            self.real = real
+            self.imaginary = imaginary
         self.argument = math.atan2(self.imaginary, self.real)
     
     def __abs__(self):
