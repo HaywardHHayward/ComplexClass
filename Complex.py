@@ -232,5 +232,7 @@ def ToComplex(number, imaginary = 0):
         return Complex(number, imaginary)
     elif (type(number) is complex):
         return Complex(number.real, number.imag)
+    elif (type(number) is Complex):
+        return number
     else:
         raise TypeError(f"unsupported type(s). Only accepted types are 'int', 'float', and 'complex'.\nAttempted cast type: '{type(number).__name__}'")
