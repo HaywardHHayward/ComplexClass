@@ -148,8 +148,24 @@ class Complex:
             return Complex(math.log(abs(self)), self.argument) / Complex(math.log(abs(base)), base.argument)
     
     def __eq__(self, other):
-        if (abs(self.real - other.real) < 0.00000001) and (abs(self.imaginary - other.imaginary) < 0.00000001):
-            return True
+        if type(other) is Complex:  
+            if (abs(self.real - other.real) < 0.00000001) and (abs(self.imaginary - other.imaginary) < 0.00000001):
+                return True
+            else:
+                return False
+        elif type(other) is complex:
+            if (abs(self.real - other.real) < 0.00000001) and (abs(self.imaginary - other.imag) < 0.00000001):
+                return True
+            else:
+                return False
+        elif (type(other) is int) or (type(other) is float):
+            if abs(self.imaginary) < 0.00000001:
+                if abs(self.real - other) < 0.00000001:
+                    return True
+                else:
+                    return False
+            else:
+                return False
         else:
             return False
 
@@ -190,13 +206,13 @@ class Complex:
         return Complex(math.trunc(self.real), math.trunc(self.imaginary))
     
     def __int__(self):
-        if (self.imaginary == 0):
+        if (abs(self.imaginary) < 0.00000001):
             return int(self.real)
         else:
             raise ValueError(f"value of 'imaginary' attribute is non-zero. Unable to cast to 'int'\n'imaginary' = {self.imaginary}")
     
     def __float__(self):
-        if (self.imaginary == 0):
+        if (abs(self.imaginary) < 0.00000001):
             return float(self.real)
         else:
             raise ValueError(f"value of 'imaginary' attribute is non-zero. Unable to cast to 'float'\n'imaginary' = {self.imaginary}")
@@ -207,5 +223,7 @@ class Complex:
 def ToComplex(number, imaginary = 0):
     if (type(number) is int) or (type(number) is float):
         return Complex(number, imaginary)
+    elif (type(number) is complex):
+        return Complex(number.real, number.imag)
     else:
-        raise TypeError("unsupported type(s). Only accepted types are 'int' and 'float'.")
+        raise TypeError(f"unsupported type(s). Only accepted types are 'int', 'float', and 'complex'.\nAttempted cast type = '{type(number).__name__}'")
