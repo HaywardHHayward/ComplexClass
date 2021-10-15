@@ -2,7 +2,8 @@ import math
 
 class Complex:
     
-    def __init__(self, real, imaginary = 0):
+    def __init__(self, real, imaginary = 0, rounding = True):
+        self.__rounding = rounding
         if type(real) is complex:
             if imaginary == 0:
                 self.real = real.real
@@ -15,6 +16,24 @@ class Complex:
             self.real = real
             self.imaginary = imaginary
         self.argument = math.atan2(self.imaginary, self.real)
+    
+    def __fix_float_impercision(self, other):
+        if self.__rounding and other.__rounding:
+            other_real = other.real
+            other_imag = other.imaginary
+            if abs(other_real - round(other_real, 8)) < 0.000000000001:
+                other_real = round(other_real, 8)
+                if other_real == round(other_real):
+                    other_real = round(other_real)
+            if abs(other_imag - round(other_imag, 8)) < 0.000000000001:
+                other_imag = round(other_imag, 8)
+                if other_imag == round(other_imag):
+                    other_imag = round(other_imag)
+            return Complex(other_real, other_imag)
+        else:
+            new_other = other
+            new_other.__rounding = False
+            return(new_other)
 
     def __abs__(self):
         return math.sqrt((self.real ** 2) + (self.imaginary ** 2))
@@ -55,7 +74,7 @@ class Complex:
         if isinstance(other, (int, float, complex)):
             other = Complex(other)
         if type(other) is Complex:
-            return Complex(self.real + other.real, self.imaginary + other.imaginary)
+            return self.__fix_float_impercision(Complex(self.real + other.real, self.imaginary + other.imaginary))
         else:
             raise TypeError(f"unsupported operand type(s) for +: 'Complex' and '{type(other).__name__}'")
     
@@ -66,7 +85,7 @@ class Complex:
         if isinstance(other, (int, float, complex)):
             other = Complex(other)
         if type(other) is Complex:
-            return Complex(self.real - other.real, self.imaginary - other.imaginary)
+            return self.__fix_float_impercision(Complex(self.real - other.real, self.imaginary - other.imaginary))
         else:
             raise TypeError(f"unsupported operand type(s) for -: 'Complex' and '{type(other).__name__}'")
     
@@ -77,7 +96,7 @@ class Complex:
         if isinstance(other, (int, float, complex)):
             other = Complex(other)
         if type(other) is Complex:
-            return Complex((self.real * other.real) - (self.imaginary * other.imaginary), (self.real * other.imaginary) + (self.imaginary * other.real))
+            return self.__fix_float_impercision(Complex((self.real * other.real) - (self.imaginary * other.imaginary), (self.real * other.imaginary) + (self.imaginary * other.real)))
         else:
             raise TypeError(f"unsupported operand type(s) for *: 'Complex' and '{type(other).__name__}'")
     
@@ -88,7 +107,7 @@ class Complex:
         if isinstance(other, (int, float, complex)):
             other = Complex(other)
         if type(other) is Complex:
-            return Complex(((self.real * other.real) + (self.imaginary * other.imaginary)) / (other.real ** 2 + other.imaginary ** 2), ((self.imaginary * other.real) - (self.real * other.imaginary)) / (other.real ** 2 + other.imaginary ** 2))
+            return self.__fix_float_impercision(Complex(((self.real * other.real) + (self.imaginary * other.imaginary)) / (other.real ** 2 + other.imaginary ** 2), ((self.imaginary * other.real) - (self.real * other.imaginary)) / (other.real ** 2 + other.imaginary ** 2)))
         else:
             raise TypeError(f"unsupported operand type(s) for /: 'Complex' and '{type(other).__name__}'")
 
@@ -150,7 +169,7 @@ class Complex:
             other = Complex(other)
         if type(other) is Complex:
             coefficient = (abs(self) ** other.real) / math.exp(other.imaginary * self.argument)
-            return Complex(coefficient * math.cos((other.real * self.argument) + (other.imaginary * math.log(abs(self)))), coefficient * math.sin((other.real * self.argument) + (other.imaginary * math.log(abs(self)))))
+            return self.__fix_float_impercision(Complex(coefficient * math.cos((other.real * self.argument) + (other.imaginary * math.log(abs(self)))), coefficient * math.sin((other.real * self.argument) + (other.imaginary * math.log(abs(self))))))
         else:
             raise TypeError(f"unsupported operand type(s) for ** or pow(): 'Complex' and '{type(other).__name__}'")
     
@@ -163,27 +182,27 @@ class Complex:
     
     def log(self, base=math.e):
         if not(isinstance(base, (Complex, complex))):
-            return Complex(math.log(abs(self)), self.argument) / math.log(base)
+            return self.__fix_float_impercision(Complex(math.log(abs(self)), self.argument, self.__rounding) / math.log(base))
         elif type(base) is complex:
             base = Complex(base)
-            return Complex(math.log(abs(self)), self.argument) / Complex(math.log(abs(base)), base.argument)
+            return self.__fix_float_impercision(Complex(math.log(abs(self)), self.argument, self.__rounding) / Complex(math.log(abs(base)), base.argument, base.__rounding))
         else:
-            return Complex(math.log(abs(self)), self.argument) / Complex(math.log(abs(base)), base.argument)
+            return self.__fix_float_impercision(Complex(math.log(abs(self)), self.argument, self.__rounding) / Complex(math.log(abs(base)), base.argument, base.__rounding))
     
     def __eq__(self, other):
         if type(other) is Complex:  
-            if (abs(self.real - other.real) < 0.00000001) and (abs(self.imaginary - other.imaginary) < 0.00000001):
+            if self.real == other.real and self.imaginary == other.imaginary:
                 return True
             else:
                 return False
         elif type(other) is complex:
-            if (abs(self.real - other.real) < 0.00000001) and (abs(self.imaginary - other.imag) < 0.00000001):
+            if self.real == other.real and self.imaginary == other.imag:
                 return True
             else:
                 return False
         elif isinstance(other, (int, float)):
-            if abs(self.imaginary) < 0.00000001:
-                if abs(self.real - other) < 0.00000001:
+            if self.imaginary == 0:
+                if self.real == other:
                     return True
                 else:
                     return False
@@ -196,25 +215,25 @@ class Complex:
         return math.e ** self
     
     def sin(self):
-        return Complex(math.sin(self.real) * math.cosh(self.imaginary), math.cos(self.real) * math.sinh(self.imaginary))
+        return self.__fix_float_impercision(Complex(math.sin(self.real) * math.cosh(self.imaginary), math.cos(self.real) * math.sinh(self.imaginary)))
     
     def cos(self):
-        return Complex(math.cos(self.real) * math.cosh(self.imaginary), -1 * math.sin(self.real) * math.sinh(self.imaginary))
+        return self.__fix_float_impercision(Complex(math.cos(self.real) * math.cosh(self.imaginary), -1 * math.sin(self.real) * math.sinh(self.imaginary)))
     
     def tan(self):
         return self.sin() / self.cos()
     
     def sinh(self):
-        return Complex(math.sinh(self.real) * math.cos(self.imaginary), math.cosh(self.real) * math.sin(self.imaginary))
+        return self.__fix_float_impercision(Complex(math.sinh(self.real) * math.cos(self.imaginary), math.cosh(self.real) * math.sin(self.imaginary)))
     
     def cosh(self):
-        return Complex(math.cosh(self.real) * math.cos(self.imaginary), math.sinh(self.real) * math.sin(self.imaginary))
+        return self.__fix_float_impercision(Complex(math.cosh(self.real) * math.cos(self.imaginary), math.sinh(self.real) * math.sin(self.imaginary)))
     
     def tanh(self):
         return self.sinh() / self.cosh()
     
     def sqrt(self):
-        return self ** 0.5
+        return self.__fix_float_impercision(self ** 0.5)
     
     def __floor__(self):
         return Complex(math.floor(self.real), math.floor(self.imaginary))
@@ -229,13 +248,13 @@ class Complex:
         return Complex(math.trunc(self.real), math.trunc(self.imaginary))
     
     def __int__(self):
-        if (abs(self.imaginary) < 0.00000001):
+        if self.imaginary == 0:
             return int(self.real)
         else:
             raise ValueError(f"value of 'imaginary' attribute is non-zero. Unable to cast to 'int'\n'imaginary' = {self.imaginary}")
     
     def __float__(self):
-        if (abs(self.imaginary) < 0.00000001):
+        if self.imaginary == 0:
             return float(self.real)
         else:
             raise ValueError(f"value of 'imaginary' attribute is non-zero. Unable to cast to 'float'\n'imaginary' = {self.imaginary}")
@@ -245,5 +264,3 @@ class Complex:
     
     def polar(self):
         return (abs(self), self.argument)
-
-print(Complex(1,2) ** Complex(3,4))
