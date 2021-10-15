@@ -15,7 +15,7 @@ class Complex:
             self.real = real
             self.imaginary = imaginary
         self.argument = math.atan2(self.imaginary, self.real)
-    
+
     def __abs__(self):
         return math.sqrt((self.real ** 2) + (self.imaginary ** 2))
     
@@ -161,8 +161,11 @@ class Complex:
         return other ** self
     
     def log(self, base=math.e):
-        if type(base) is not Complex:
+        if not(isinstance(base, (Complex, complex))):
             return Complex(math.log(abs(self)), self.argument) / math.log(base)
+        elif type(base) is complex:
+            base = Complex(base)
+            return Complex(math.log(abs(self)), self.argument) / Complex(math.log(abs(base)), base.argument)
         else:
             return Complex(math.log(abs(self)), self.argument) / Complex(math.log(abs(base)), base.argument)
     
