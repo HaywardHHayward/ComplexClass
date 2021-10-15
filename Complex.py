@@ -15,7 +15,7 @@ class Complex:
             self.real = real
             self.imaginary = imaginary
         self.argument = math.atan2(self.imaginary, self.real)
-    
+
     def __abs__(self):
         return math.sqrt((self.real ** 2) + (self.imaginary ** 2))
     
@@ -149,7 +149,8 @@ class Complex:
         if isinstance(other, (int, float, complex)):
             other = Complex(other)
         if type(other) is Complex:
-            return (abs(self) ** other.real) * (Complex(math.cos(math.log(abs(self)) * other.imaginary), math.sin(math.log(abs(self)) * other.imaginary))) * Complex(math.cos(self.argument * other.real), math.sin(self.argument * other.real)) / math.exp(self.argument * other.imaginary)
+            coefficient = (abs(self) ** other.real) / math.exp(other.imaginary * self.argument)
+            return Complex(coefficient * math.cos((other.real * self.argument) + (other.imaginary * math.log(abs(self)))), coefficient * math.sin((other.real * self.argument) + (other.imaginary * math.log(abs(self)))))
         else:
             raise TypeError(f"unsupported operand type(s) for ** or pow(): 'Complex' and '{type(other).__name__}'")
     
@@ -238,3 +239,8 @@ class Complex:
 
     def __complex__(self):
         return complex(self.real, self.imaginary)
+    
+    def polar(self):
+        return (abs(self), self.argument)
+
+print(Complex(1,2) ** Complex(3,4))
