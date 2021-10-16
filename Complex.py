@@ -264,3 +264,7 @@ class Complex:
     
     def polar(self):
         return (abs(self), self.argument)
+
+    def conjucate(self):
+        return Complex(self.real, -self.imaginary, self.__rounding)
+
